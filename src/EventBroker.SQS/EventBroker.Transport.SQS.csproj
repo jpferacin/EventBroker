@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="4.0.3.12" />
+    <PackageReference Include="AWSSDK.SQS" Version="4.0.2.3" />
+	<PackageReference Include="AWSSDK.S3" Version="4.0.12" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.3" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\EventBroker.Core\EventBroker.Core.csproj" />
+  </ItemGroup>
+</Project>
