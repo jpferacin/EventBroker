@@ -12,5 +12,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\EventBroker.InMemory\EventBroker.Transport.InMemory.csproj" />
+    <ProjectReference Include="..\..\src\EventBroker.SQS\EventBroker.Transport.SQS.csproj" />
   </ItemGroup>
 </Project>

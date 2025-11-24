@@ -4,6 +4,6 @@ namespace SiriusPt.EventBroker.Core;
 
 public class WorkerPollingOptions : IWorkerPollingOptions
 {
-    public int HeartbeatIntervalSeconds { get; init; }
-    public int PollingIntervalSeconds { get; init; }
+    public int HeartbeatIntervalSeconds { get; init; } = 5*60;
+    public int PollingIntervalSeconds { get; init; } = 5;
 }

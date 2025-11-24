@@ -75,7 +75,7 @@ public abstract partial class EventQueueWorker : BackgroundService
         }
     }
 
-    protected async Task<EventProcessResult> DispatchRawEventAsync(string eventType, string message, CancellationToken token)
+    public async Task<EventProcessResult> DispatchRawEventAsync(string eventType, string message, CancellationToken token)
     {
         var queueName = _consumer.QueueName;
         var mapping = _eventConfiguration.GetHandlerForMessage(eventType);
@@ -96,7 +96,7 @@ public abstract partial class EventQueueWorker : BackgroundService
         return await _eventInvoker.InvokeHandlerAsync(mapping, typedEvent, token);
     }
 
-    protected async Task<EventProcessResult> DispatchRawEventAsync(string eventType, object typedEvent, CancellationToken token)
+    public async Task<EventProcessResult> DispatchRawEventAsync(string eventType, object typedEvent, CancellationToken token)
     {
         var queueName = _consumer.QueueName;
         var mapping = _eventConfiguration.GetHandlerForMessage(eventType);

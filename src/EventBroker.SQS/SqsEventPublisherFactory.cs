@@ -27,10 +27,16 @@ public class SqsEventPublisherFactory : IEventPublisherFactory
         //var logger = _loggerFactory.CreateLogger<SqsEventPublisher>();
 
         //check if queueName is a valid Uri or a simple name
-        var uri = new Uri(queueName);
-        if (uri.IsAbsoluteUri)
+        try
         {
-            return new SqsEventPublisher(_sqsClient, queueName);
+            var uri = new Uri(queueName);
+            if (uri.IsAbsoluteUri)
+            {
+                return new SqsEventPublisher(_sqsClient, queueName);
+            }
+        }
+        catch (Exception)
+        {
         }
 
         var options =

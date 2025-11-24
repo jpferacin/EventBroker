@@ -1,11 +1,25 @@
-﻿using System.Text.Json;
-using SiriusPt.EventBroker.Transport.SQS.Helpers;
+﻿using SiriusPt.EventBroker.Core.Events;
+using SiriusPt.EventBroker.Core.Helpers;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Xunit;
 
-namespace SiriusPt.EventBroker.Tests;
+namespace EventBroker.Core.Tests;
 
-public class MessageEnvelopeHelperTests
+public class CloudEventHelperTests
 {
+    public class EventWithEventBridgeEnvelope
+    {
+        [JsonPropertyName("source")]
+        public string Source { get; set; } = string.Empty;
+
+        [JsonPropertyName("detail-type")]
+        public string Type { get; set; } = string.Empty;
+
+        [JsonPropertyName("detail")]
+        public object Detail { get; set; } = new { Id = 456, Name = "EventBridge-Test" };
+    }
+
     [Fact]
     public void UnwrapPayload_ShouldReturnMessage_FromSNS()
     {
@@ -17,7 +31,7 @@ public class MessageEnvelopeHelperTests
         });
 
         // Act
-        var result = MessageEnvelopeHelper.UnwrapPayload(snsEnvelope);
+        var result = CloudEventHelper.UnwrapPayload(snsEnvelope);
 
         // Assert
         Assert.Contains("\"Id\":123", result);
@@ -28,15 +42,15 @@ public class MessageEnvelopeHelperTests
     public void UnwrapPayload_ShouldReturnDetail_FromEventBridge()
     {
         // Arrange: EventBridge envelope with detail property
-        var eventBridgeEnvelope = JsonSerializer.Serialize(new
+        var eventBridgeEnvelope = JsonSerializer.Serialize(new EventWithEventBridgeEnvelope
         {
-            source = "aws.events",
-            ["detail-type"] = "TestEvent",
-            detail = new { Id = 456, Name = "EventBridge-Test" }
+            Source = "aws.events",
+            Type = "TestEvent",
+            Detail = new { Id = 456, Name = "EventBridge-Test" }
         });
 
         // Act
-        var result = MessageEnvelopeHelper.UnwrapPayload(eventBridgeEnvelope);
+        var result = CloudEventHelper.UnwrapPayload(eventBridgeEnvelope);
 
         // Assert
         Assert.Contains("\"Id\":456", result);
@@ -50,7 +64,7 @@ public class MessageEnvelopeHelperTests
         var rawMessage = "{\"Id\":789,\"Name\":\"DirectSQS\"}";
 
         // Act
-        var result = MessageEnvelopeHelper.UnwrapPayload(rawMessage);
+        var result = CloudEventHelper.UnwrapPayload(rawMessage);
 
         // Assert
         Assert.Equal(rawMessage, result);
@@ -63,7 +77,7 @@ public class MessageEnvelopeHelperTests
         var invalidJson = "Not a JSON string";
 
         // Act
-        var result = MessageEnvelopeHelper.UnwrapPayload(invalidJson);
+        var result = CloudEventHelper.UnwrapPayload(invalidJson);
 
         // Assert
         Assert.Equal(invalidJson, result);

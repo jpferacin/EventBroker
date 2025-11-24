@@ -1,30 +1,29 @@
 using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
-using SiriusPt.EventBroker.InMemory;
+using SiriusPt.EventBroker.Transport.InMemory;
 using Xunit;
 
-namespace SiriusPt.EventBroker.Tests;
+namespace EventBroker.Transport.InMemory.Tests;
 
 public class InMemoryTests
 {
     [Fact]
-    public async Task PublishAndConsume_ShouldWork()
+    public async Task PublishAndConsumeShouldWork()
     {
         var queue = new ConcurrentQueue<string>();
-        var publisher = new InMemoryEventPublisher(queue);
-        var consumer = new InMemoryEventConsumer(queue);
+        var publisher = new InMemoryEventPublisher(queue, "TestQueue");
+        var consumer = new InMemoryEventConsumer(queue, "TestQueue");
 
         await publisher.PublishAsync(new { Id = 123, Name = "UnitTest" });
 
-        var cts = new CancellationTokenSource();
-        string received = null;
+        var received = null as string;
 
         _ = consumer.StartAsync(async msg =>
         {
             received = msg;
-            cts.Cancel();
-        }, cts.Token);
+            return await Task.FromResult(true);
+        });
 
         await Task.Delay(500);
 

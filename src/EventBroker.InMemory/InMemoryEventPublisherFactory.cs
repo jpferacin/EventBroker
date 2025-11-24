@@ -21,10 +21,16 @@ public class InMemoryEventPublisherFactory : IEventPublisherFactory
 
     public IEventPublisher CreatePublisher(string queueName)
     {
-        var uri = new Uri(queueName);
-        if (uri.IsAbsoluteUri)
+        try
         {
-            return new InMemoryEventPublisher(new(), queueName);
+            var uri = new Uri(queueName);
+            if (uri.IsAbsoluteUri)
+            {
+                return new InMemoryEventPublisher(new(), queueName);
+            }
+        }
+        catch (Exception)
+        {
         }
 
         var options = _queueConfiguration.Queues.FirstOrDefault(q => q.Name.Equals(queueName, StringComparison.OrdinalIgnoreCase))

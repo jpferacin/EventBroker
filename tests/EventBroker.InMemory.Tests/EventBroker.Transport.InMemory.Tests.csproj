@@ -8,6 +8,6 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.3" />
     <ProjectReference Include="..\..\src\EventBroker.Core\EventBroker.Core.csproj" />
-    <ProjectReference Include="..\..\src\EventBroker.InMemory\EventBroker.InMemory.csproj" />
+    <ProjectReference Include="..\..\src\EventBroker.InMemory\EventBroker.Transport.InMemory.csproj" />
   </ItemGroup>
 </Project>

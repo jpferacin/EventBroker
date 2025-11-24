@@ -1,15 +1,15 @@
 using Amazon;
 using Amazon.Runtime.CredentialManagement;
-using Amazon.SQS;
-using SiriusPt.EventBroker.Abstractions.Events;
 using Microsoft.Extensions.Logging;
-using SiriusPt.EventBroker.AWS;
-using SiriusPt.EventBroker.InMemory;
 using System;
 using System.Collections.Concurrent;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using SiriusPt.EventBroker.Core.Events;
+using SiriusPt.EventBroker.Transport.SQS;
+using Amazon.SQS;
+using SiriusPt.EventBroker.Transport.InMemory;
 
 class Program
 {
@@ -51,7 +51,7 @@ class Program
 
         const string sqsUrl = "https://sqs.eu-central-1.amazonaws.com/041717511598/Sics-Events";
         var publisher = new SqsEventPublisher(sqsClient, sqsUrl);
-        var consumer = new SqsEventConsumer(sqsClient, sqsUrl, logger); // DLQ optional
+        var consumer = new SqsEventConsumer(logger, sqsClient, sqsUrl); // DLQ optional
 
         Console.WriteLine("Publishing message to SQS...");
         await publisher.PublishAsync(CreateCloudEvent( new TestMessage { Id = 1, Name = "Test" }));
@@ -61,7 +61,9 @@ class Program
         {
             var msg = evt.Data;
             Console.WriteLine($"[SQS] Received typed message: Id={msg.Id}, Name={msg.Name}");
-        }, cts.Token);
+            cts.Cancel(); // Stop after first message for demo
+            return await Task.FromResult(true);
+        });
 
 
         Thread.Sleep(2000); // Wait a bit to ensure the message is available
@@ -69,7 +71,7 @@ class Program
         // InMemory Example for Tests
         var queue = new ConcurrentQueue<string>();
         var testPublisher = new InMemoryEventPublisher(queue);
-        var testConsumer = new InMemoryEventConsumer(queue);
+        var testConsumer = new InMemoryEventConsumer(queue, "TestQueue");
 
         Console.WriteLine("Publishing message to InMemory queue...");
         await testPublisher.PublishAsync(new { Id = 2, Name = "InMemory" });
@@ -84,7 +86,8 @@ class Program
                 Console.WriteLine($"[InMemory] Received dynamic message: Id={id}, Name={name}");
             }
             cts.Cancel(); // Stop after first message for demo
-        }, cts.Token);
+            return await Task.FromResult(true);
+        });
 
         Console.WriteLine("Press any key to exit...");
         Console.ReadKey();

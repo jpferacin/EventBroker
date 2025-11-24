@@ -13,6 +13,12 @@ public class InMemoryEventConsumer : IEventConsumer
 
     public string QueueName { get; }
 
+    public InMemoryEventConsumer(string name)
+    {
+        _queue = new ConcurrentQueue<string>();
+        QueueName = name;
+    }
+
     public InMemoryEventConsumer(ConcurrentQueue<string> queue, string name)
     {
         _queue = queue;
